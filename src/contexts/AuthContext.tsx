@@ -1,6 +1,5 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { toast } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 
 type User = {
   id: string;
@@ -20,8 +19,6 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// In a real app, we would connect to a backend
-// For now, we'll use localStorage to mock persistence
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);

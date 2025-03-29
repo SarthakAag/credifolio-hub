@@ -1,7 +1,6 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { toast } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 
 export type Transaction = {
   id: string;
@@ -28,7 +27,6 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Load transactions when user changes
   useEffect(() => {
     if (user) {
       getTransactions();
@@ -42,7 +40,6 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     
     setIsLoading(true);
     try {
-      // Mock API delay
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const allTransactions = JSON.parse(localStorage.getItem('bankingTransactions') || '[]');
@@ -67,7 +64,6 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     
     setIsLoading(true);
     try {
-      // Mock API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       const allTransactions = JSON.parse(localStorage.getItem('bankingTransactions') || '[]');
@@ -76,7 +72,6 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
       const currentUser = users.find((u: any) => u.id === user.id);
       if (!currentUser) throw new Error('User not found');
       
-      // Create new transaction
       const newTransaction: Transaction = {
         id: `txn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         userId: user.id,
@@ -85,7 +80,6 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
         ...newTransactionData
       };
       
-      // Update user balance based on transaction type
       switch (newTransaction.type) {
         case 'deposit':
           currentUser.balance += newTransaction.amount;
@@ -103,27 +97,21 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
             throw new Error('Insufficient funds');
           }
           currentUser.balance -= newTransaction.amount;
-          // In a real app, we would credit the recipient here
           break;
         case 'credit':
-          // For credit operations, we would handle differently in a real app
           currentUser.balance += newTransaction.amount;
           break;
       }
       
-      // Save updated data
       allTransactions.push(newTransaction);
       localStorage.setItem('bankingTransactions', JSON.stringify(allTransactions));
       
-      // Update users array with the modified user
       const updatedUsers = users.map((u: any) => u.id === currentUser.id ? currentUser : u);
       localStorage.setItem('bankingUsers', JSON.stringify(updatedUsers));
       
-      // Update current user in local storage to reflect balance change
       const { password: _, ...userWithoutPassword } = currentUser;
       localStorage.setItem('bankingUser', JSON.stringify(userWithoutPassword));
       
-      // Refresh transactions list
       await getTransactions();
       
       toast.success('Transaction completed successfully');
